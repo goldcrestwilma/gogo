@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"testing"
+	"time"
 )
 
 type helloWorldRequest struct {
@@ -28,32 +31,68 @@ type helloWorldResponse struct {
 func main() {
 	port := 8080
 
-	http.HandleFunc("/helloWorld", helloWorldHandler)
+	//http.HandleFunc("/helloWorld", helloWorldHandler)
+	handler := newValidationHandler(newHelloWorldHandler())
+
+	catHandler := http.FileServer(http.Dir("./images"))
+	http.Handle("/cat/", http.StripPrefix("/cat/", catHandler))
+
+	http.Handle("/helloWorld", handler)
 
 	log.Printf("Server starting on port %v\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }
 
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
+type validationHandler struct {
+	next http.Handler
+}
+
+type validationContextKey string
+
+func (h validationHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request helloWorldRequest
 	decoder := json.NewDecoder(r.Body)
 
 	err := decoder.Decode(&request)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(rw, "Bad request", http.StatusBadRequest)
 		return
 	}
 
-	response := helloWorldResponse{Message: "Hello " + request.Name}
-	encoder := json.NewEncoder(w)
-	encoder.Encode(&response)
-	/*
-		data, err := json.Marshal(response)
+	c := context.WithValue(r.Context(), validationContextKey("name"), request.Name)
+	r = r.WithContext(c)
 
-		if err != nil {
-			panic("Ooops")
-		}
+	h.next.ServeHTTP(rw, r)
+}
 
-		fmt.Fprint(w, string(data))
-	*/
+func newValidationHandler(next http.Handler) http.Handler {
+	return validationHandler{next: next}
+}
+
+type helloWorldHandler struct{}
+
+func newHelloWorldHandler() http.Handler {
+	return helloWorldHandler{}
+}
+
+func (h helloWorldHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	name := r.Context().Value(validationContextKey("name")).(string)
+	response := helloWorldResponse{Message: "Hello " + name}
+
+	encdoer := json.NewEncoder(rw)
+	encdoer.Encode(response)
+}
+
+func fetchGoogle(t *testing.T) {
+	r, _ := http.NewRequest("GET", "https://google.com", nil)
+
+	timeoutRequest, cancelFunc := context.WithTimeout(r.Context(), 1*time.Millisecond)
+	defer cancelFunc()
+
+	r = r.WithContext(timeoutRequest)
+
+	_, err := http.DefaultClient.Do(r)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 }
