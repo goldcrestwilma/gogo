@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"../contract"
+	"github.com/goldcrestwilma/gogo/msa/rpc/contract"
 )
 
 const port = 8888

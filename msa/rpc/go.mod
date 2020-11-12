@@ -1,3 +1,3 @@
-module contract/entities.go
+module msa/rpc
 
 go 1.13

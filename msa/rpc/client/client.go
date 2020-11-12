@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/rpc"
 
-	"github.com/goldcrestwilma/microservice/rpc/contract"
+	"github.com/goldcrestwilma/gogo/msa/rpc/contract"
 )
 
 const port = 8888
