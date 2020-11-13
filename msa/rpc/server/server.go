@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/goldcrestwilma/gogo/msa/rpc/contract"
+	"github.com/building-microservices-with-go/chapter1/rpc/contract"
 )
 
 const port = 8888
@@ -26,9 +26,9 @@ func StartServer() {
 		log.Fatal(fmt.Sprintf("Unable to listen on given port: %s", err))
 	}
 
+	defer l.Close()
 	//log.Printf("Server starting on port %v\n", port)
 	//http.Serve(l, nil)
-	defer l.close()
 
 	for {
 		conn, _ := l.Accept()

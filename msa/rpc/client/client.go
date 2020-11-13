@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/rpc"
 
-	"github.com/goldcrestwilma/gogo/msa/rpc/contract"
+	"github.com/building-microservices-with-go/chapter1/rpc/contract"
 )
 
 const port = 8888
@@ -21,7 +21,7 @@ func CreateClient() *rpc.Client {
 }
 
 func PerformRequest(client *rpc.Client) contract.HelloWorldResponse {
-	args := &contract.HelloWorldResponse{Name: "World"}
+	args := &contract.HelloWorldRequest{Name: "World"}
 	var reply contract.HelloWorldResponse
 
 	err := client.Call("HelloWorldHandler.HelloWorld", args, &reply)

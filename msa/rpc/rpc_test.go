@@ -3,8 +3,10 @@ package main
 import (
 	"testing"
 
-	"microservice/rpc/client"
-	"microservice/rpc/server"
+	//"msa/rpc/client"
+	//"msa/rpc/server"
+	"github.com/building-microservices-with-go/chapter1/rpc/client"
+	"github.com/building-microservices-with-go/chapter1/rpc/server"
 )
 
 func BenchmarkDial(b *testing.B) {
