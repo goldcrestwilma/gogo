@@ -73,3 +73,26 @@ ENTRYPOINT ["./server"]
 $ docker build -t testserver .
 $ docker run --rm -p 8080:8080 testserver
 ```
+
+## Docker Compose
+YAML 파일에 저장된 스택(애플리케이션 개발에 사용되는 언어, 프레임워크, 데이터베이스 등 기술 및 도구 일체) 정의를 이용해 여러 컨테이너를 동시에 시작할 수 있는 Docker의 강력한 기능
+vi docker-compose.yml
+```
+version: '2'
+services:
+    testserver:
+        image: testserver
+    curl:
+        image: appropriate/curl 
+        entrypoint: sh -c  "sleep 3 && curl -XPOST testserver:8080/helloworld -d '{\"name\":\"mk\"}'"
+```
+
+`version`: Docker compose 파일의 버전 정의
+`services`: 스택을 시작하려는 컨테이너(하위로 testserver, curl 서비스를 정의)
+
+```
+$ docker-compose up
+$ docker-compose rm -v // 중지한 컨테이너 제거 (-v 인수를 전달해 관련 볼륨 제거)
+$ docker-compose -f ./docker-compose.yml up // 파일 위치 지정
+$ docker-compose -p testproject up // 프로젝트 이름 지정하여 실행
+```
