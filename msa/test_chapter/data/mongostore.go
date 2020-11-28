@@ -2,12 +2,10 @@ package data
 
 import "labix.org/v2/mgo"
 
-// MongoStore is a MongoDB data store which implements the Store interface
 type MongoStore struct {
 	session *mgo.Session
 }
 
-// NewMongoStore creates an instance of MongoStore with the given connection string
 func NewMongoStore(connection string) (*MongoStore, error) {
 	session, err := mgo.Dial(connection)
 	if err != nil {
@@ -17,7 +15,6 @@ func NewMongoStore(connection string) (*MongoStore, error) {
 	return &MongoStore{session: session}, nil
 }
 
-// Search returns Kittens from the MongoDB instance which have the name name
 func (m *MongoStore) Search(name string) []Kitten {
 	s := m.session.Clone()
 	defer s.Close()
@@ -32,7 +29,6 @@ func (m *MongoStore) Search(name string) []Kitten {
 	return results
 }
 
-// DeleteAllKittens deletes all the kittens from the datastore
 func (m *MongoStore) DeleteAllKittens() {
 	s := m.session.Clone()
 	defer s.Close()
